@@ -1,0 +1,237 @@
+
+// 全局样式优化
+body {
+  border: 1px solid rgba(0, 0, 0, 0.03125) !important;
+  box-shadow:
+    0px 0.3px 0.9px rgb(0 0 0 / 10%),
+    0px 1.6px 3.6px rgb(0 0 0 / 10%) !important;
+}
+
+// 改善组件间距和布局
+.v-main {
+  .v-container {
+    max-width: 1400px;
+  }
+}
+
+// 优化卡片样式
+.v-card {
+  border-radius: 12px !important;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  
+  &:hover {
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12) !important;
+  }
+  
+  .v-card-title {
+    padding: 24px 24px 16px 24px;
+    font-size: 1.25rem;
+    font-weight: 600;
+    letter-spacing: -0.025em;
+  }
+  
+  .v-card-text {
+    padding: 16px 24px 24px 24px;
+    line-height: 1.6;
+  }
+}
+
+// 优化按钮组
+.btn-group {
+  gap: 12px;
+  
+  .v-btn {
+    min-height: 44px;
+    padding: 0 24px;
+    border-radius: 8px;
+    font-weight: 500;
+    letter-spacing: 0.025em;
+    transition: all 0.2s ease-in-out;
+    
+    &:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    }
+  }
+}
+
+// 优化表单元素间距
+.v-row {
+  .v-col {
+    padding: 12px;
+  }
+}
+
+.v-text-field,
+.v-select,
+.v-textarea {
+  margin-bottom: 8px;
+  
+  .v-field {
+    border-radius: 8px;
+  }
+}
+
+// 优化开关和单选按钮
+.v-switch {
+  margin-bottom: 16px;
+  
+  .v-selection-control__wrapper {
+    margin-right: 16px;
+  }
+}
+
+.v-radio-group {
+  .v-radio {
+    margin-bottom: 12px;
+  }
+}
+
+// 优化列表项间距
+.v-list {
+  .v-list-item {
+    padding: 12px 16px;
+    margin-bottom: 8px;
+    border-radius: 8px;
+    transition: all 0.2s ease-in-out;
+    
+    &:hover {
+      background-color: rgba(var(--v-theme-primary), 0.08);
+      transform: translateX(4px);
+    }
+    
+    .v-list-item-title {
+      font-weight: 500;
+      margin-bottom: 4px;
+    }
+    
+    .v-list-item-subtitle {
+      opacity: 0.7;
+      font-size: 0.875rem;
+    }
+  }
+}
+
+// 优化表格样式
+.v-table {
+  border-radius: 8px;
+  overflow: hidden;
+  
+  .v-table__wrapper {
+    border-radius: 8px;
+  }
+  
+  thead {
+    th {
+      padding: 16px 20px;
+      font-weight: 600;
+      font-size: 0.875rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      background-color: rgba(var(--v-theme-surface-variant), 0.4);
+    }
+  }
+  
+  tbody {
+    tr {
+      transition: background-color 0.2s ease-in-out;
+      
+      &:hover {
+        background-color: rgba(var(--v-theme-primary), 0.04);
+      }
+      
+      td {
+        padding: 16px 20px;
+        border-bottom: 1px solid rgba(var(--v-border-color), 0.12);
+        
+        &:first-child {
+          font-weight: 500;
+        }
+      }
+    }
+  }
+}
+
+// 优化芯片样式
+.v-chip {
+  border-radius: 16px;
+  font-weight: 500;
+  letter-spacing: 0.025em;
+  
+  &.v-chip--size-small {
+    height: 28px;
+    padding: 0 12px;
+  }
+}
+
+// 优化分隔线
+.v-divider {
+  margin: 24px 0;
+  opacity: 0.12;
+}
+
+// 优化滑块
+.v-slider {
+  margin: 16px 0;
+  
+  .v-slider-track__fill {
+    border-radius: 4px;
+  }
+  
+  .v-slider-thumb {
+    border-radius: 50%;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  }
+}
+
+// 优化页面标题区域
+.page-header {
+  margin-bottom: 32px;
+  
+  h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    letter-spacing: -0.05em;
+    margin-bottom: 8px;
+  }
+  
+  p {
+    font-size: 1.125rem;
+    opacity: 0.8;
+  }
+}
+
+// 响应式间距调整
+@media (max-width: 960px) {
+  .v-card {
+    .v-card-title {
+      padding: 20px 20px 12px 20px;
+    }
+    
+    .v-card-text {
+      padding: 12px 20px 20px 20px;
+    }
+  }
+  
+  .btn-group {
+    flex-direction: column;
+    
+    .v-btn {
+      width: 100%;
+      margin-bottom: 8px;
+    }
+  }
+}
+
+// 优化导航抽屉
+.v-navigation-drawer {
+  .v-list {
+    padding: 8px 16px;
+    
+    .v-list-item {
+      margin-bottom: 4px;
+      border-radius: 12px;
+    }
+  }
+}
