@@ -26,3 +26,30 @@
         
         <div class="progress-container">
           <div class="progress-bar" :style="{ width: dl.progress + '%' }" :class="{ pulse: dl.status === 'downloading' }"></div>
+        </div>
+        
+        <div class="item-footer">
+          <div class="controls">
+            <button v-if="dl.status === 'downloading'" @click="togglePause(dl)" class="ctrl-btn pause">⏸</button>
+            <button v-if="dl.status === 'paused'" @click="togglePause(dl)" class="ctrl-btn resume">▶️</button>
+            <button v-if="dl.status !== 'finished' && dl.status !== 'cancelled'" @click="cancelDownload(dl)" class="ctrl-btn cancel">✖️</button>
+          </div>
+          <div class="info">
+            <span>{{ dl.progress }}%</span>
+            <span v-if="dl.status === 'finished'" class="check">✅</span>
+            <span v-if="dl.status === 'cancelled'" class="cancelled">Cancelled</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <button v-if="downloads.length > 0" @click="clearList" class="clear-btn">Clear Finished / Cancelled</button>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { ref, onMounted, computed } from 'vue';
+
+interface Download {
+  id: string;
+  title: string;
