@@ -30,3 +30,13 @@ function resumeDownload(id) {
     resumeSignals.dispatchEvent(new CustomEvent('resume_' + id));
     updateProgress(dl.lastProgress, id, dl.page, dl.download_id, 'downloading');
   }
+}
+
+function cancelDownload(id) {
+  const dl = downloadRegistry.get(id);
+  if (dl) {
+    dl.status = 'cancelled';
+    if (dl.abortController) dl.abortController.abort();
+    downloadRegistry.delete(id);
+    updateProgress(0, id, dl.page, dl.download_id, 'cancelled');
+  }
