@@ -123,3 +123,23 @@ onMounted(() => {
     }
   });
 });
+</script>
+
+<style scoped>
+.side-panel {
+  padding: 16px;
+  font-family: 'Inter', -apple-system, system-ui, sans-serif;
+  background: #0f172a;
+  color: #f8fafc;
+  min-height: 100vh;
+  box-sizing: border-box;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+.header h3 { margin: 0; font-size: 18px; font-weight: 700; background: linear-gradient(to right, #38bdf8, #818cf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
