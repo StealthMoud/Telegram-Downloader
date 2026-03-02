@@ -188,3 +188,26 @@ async function handleMediaDownload(targetEl: HTMLElement, mid: string, btn: HTML
       if (prog >= 100 || status === 'cancelled') document.removeEventListener(progressId, progressHandler);
     };
     document.addEventListener(progressId, progressHandler);
+
+    document.dispatchEvent(event);
+  } else {
+    alert('Capture failed. Please try clicking the media manually while waitng.');
+  }
+
+  // 4. Surgical Auto-Close Viewer
+  setTimeout(() => {
+    if (version === 'a') {
+      const actions = document.querySelector('.MediaViewerActions');
+      const closeBtns = actions?.querySelectorAll('.Button.smaller.round');
+      if (closeBtns && closeBtns.length > 0) {
+        surgicalClick(closeBtns[closeBtns.length - 1] as HTMLElement);
+      }
+    } else {
+      const viewer = document.querySelector('.media-viewer-whole');
+      const buttons = viewer?.querySelectorAll('.media-viewer-buttons .btn-icon');
+      if (buttons && buttons.length >= 5) {
+        surgicalClick(buttons[4] as HTMLElement); // 5th is usually Close
+      }
+    }
+    btn.classList.remove('loading');
+    btn.innerText = originalText;
