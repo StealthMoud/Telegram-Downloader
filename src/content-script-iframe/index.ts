@@ -163,3 +163,13 @@ async function handleMediaDownload(targetEl: HTMLElement, mid: string, btn: HTML
       status: 'starting',
       title: finalTitle
     });
+
+    const event = new CustomEvent(DOWNLOAD_EVENT, {
+      detail: {
+        video_src: { video_url: capturedUrl, video_id: mid, page: 'content', download_id: mid },
+        type: 'single',
+        title: finalTitle,
+        customTitle: prefix
+      }
+    });
+
