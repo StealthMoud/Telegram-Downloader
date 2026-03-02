@@ -89,3 +89,20 @@ async function handleMediaDownload(targetEl: HTMLElement, mid: string, btn: HTML
   // 1. Trigger Media Viewer Surgically
   console.log('[TG-DL] Surgically opening viewer for:', mid);
   surgicalClick(targetEl);
+
+  let capturedUrl = null;
+  let type: 'video' | 'image' = 'image';
+
+  // 2. Original Polling Logic (Version Specific)
+  if (version === 'a') {
+    // Web A: Poll for Slide--active
+    for (let i = 0; i < 15; i++) {
+      await sleep(200);
+      const activeSlide = document.querySelector('.MediaViewerSlide--active');
+      if (activeSlide) {
+        const video = activeSlide.querySelector('video') as HTMLVideoElement;
+        const img = activeSlide.querySelector('img.full-media') as HTMLImageElement;
+        if (video?.src && video.src.length > 20) {
+          capturedUrl = video.src;
+          type = 'video';
+          break;
