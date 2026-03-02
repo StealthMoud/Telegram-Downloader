@@ -143,3 +143,19 @@ const downloadVideo = (url, id = '', page, download_id, detail) => {
       .then((resBlob) => {
         if (resBlob) blobs.push(resBlob);
       })
+      .then(() => {
+        if (!_totalSize) {
+          throw new Error('_totalSize is NULL');
+        }
+
+        if (nextOffset < _totalSize) {
+          fetchNextPart();
+        } else {
+          saveFile();
+        }
+      })
+      .catch((reason) => {
+        if (reason.name === 'AbortError') return;
+        console.error('downloadVideo fetch error:', reason, fileName);
+        updateProgress(0, id, page, download_id, 'error');
+        downloadRegistry.delete(id);
