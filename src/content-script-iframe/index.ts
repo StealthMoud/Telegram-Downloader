@@ -298,3 +298,101 @@ function addDownloadButton(container: HTMLElement, targetEl: HTMLElement, mid: s
     if (type === 'audio') {
       await handleAudioDownload(container, mid, btn);
     } else {
+      await handleMediaDownload(targetEl, mid, btn);
+    }
+  };
+
+  container.appendChild(btn);
+}
+
+// --- SCANNER ---
+
+function scan() {
+  // Web A
+  document.querySelectorAll('.Message.message-list-item').forEach(el => {
+    const mid = el.getAttribute('data-message-id');
+    if (!mid) return;
+
+    // Only target media containers, excluding plain text
+    const media = el.querySelector('.media-inner, .Album, .media-photo, .media-video') as HTMLElement;
+    if (media) addDownloadButton(media, media, mid, 'media');
+
+    const audio = el.querySelector('.Audio') as HTMLElement;
+    if (audio) addDownloadButton(audio, audio, mid, 'audio');
+  });
+
+  // Web K
+  document.querySelectorAll('.bubble-content-wrapper, .media-container, .audio').forEach(el => {
+    const parent = el.closest('[data-mid], [data-message-id]') as HTMLElement;
+    const mid = parent?.getAttribute('data-mid') || parent?.getAttribute('data-message-id');
+    if (!mid) return;
+
+    if (el.classList.contains('audio')) {
+      addDownloadButton(el as HTMLElement, el as HTMLElement, mid, 'audio');
+    } else {
+      // Only inject if it's a media container, not just text
+      const media = el.querySelector('.media-photo, .media-video, .document-container, img.full-media') as HTMLElement;
+      if (media) addDownloadButton(el as HTMLElement, media, mid, 'media');
+    }
+  });
+}
+
+// --- INITIALIZATION ---
+
+function init() {
+  detectVersion();
+
+  if (!document.getElementById('tg-dl-styles')) {
+    const s = document.createElement('style');
+    s.id = 'tg-dl-styles';
+    s.textContent = `
+      .tg-download-btn {
+        color: #ffffff !important;
+        background: linear-gradient(135deg, #1677ff 0%, #2aa0ff 100%) !important;
+        padding: 6px 12px !important;
+        min-width: 84px !important;
+        height: 34px !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        border-radius: 8px !important;
+        border: none !important;
+        box-shadow: 0 4px 12px rgba(22, 117, 255, 0.2) !important;
+        cursor: pointer !important;
+        transition: all 0.2s ease !important;
+        font-weight: 600 !important;
+        font-size: 12px !important;
+        z-index: 1000 !important;
+        margin: 4px !important;
+        display: block !important;
+      }
+      .tg-download-btn:hover {
+        transform: translateY(-1px) !important;
+        box-shadow: 0 6px 16px rgba(22, 117, 255, 0.3) !important;
+      }
+      .tg-download-btn.loading { opacity: 0.7 !important; pointer-events: none !important; }
+      .downloadaudio { min-width: 120px !important; }
+    `;
+    document.head.appendChild(s);
+  }
+
+  const script = document.createElement('script');
+  script.src = chrome.runtime.getURL('main.js');
+  document.body.appendChild(script);
+
+  setInterval(scan, 3000);
+  scan();
+
+  // Listen for control messages from extension sidepanel
+  chrome.runtime.onMessage.addListener((msg) => {
+    if (['PAUSE_DOWNLOAD', 'RESUME_DOWNLOAD', 'CANCEL_DOWNLOAD'].includes(msg.type)) {
+      window.postMessage({ type: msg.type, id: msg.id }, '*');
+    }
+  });
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', init);
+} else {
+  init();
+}
