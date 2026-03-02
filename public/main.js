@@ -226,3 +226,25 @@ async function handleDownload(url, id, page, download_id, detail) {
     // 3. Re-check after Fetch
     dl = downloadRegistry.get(id);
     if (!dl || dl.status === 'cancelled') return;
+    if (dl.status === 'paused') await waitForResume(id);
+
+    let progress = Array(n)
+      .fill(0)
+      .map((e, t) => t * c)
+      .map((t, r) => {
+        let a = Math.min(t + c - 1, d - 1),
+          o = { Range: `bytes=${t}-${a}` };
+        return () =>
+          fetch(url, { headers: o, signal: abortController.signal }).then((res) => {
+            if (408 === res.status) {
+              throw Error('fetch Error', {
+                cause: {
+                  range: `bytes=${t}-${a}`,
+                  index: r,
+                  response: res,
+                },
+              });
+            }
+            let prog = ((a / d) * 100).toFixed(2);
+
+            return (updateProgress(prog, id, page, download_id, downloadRegistry.get(id)?.status || 'downloading'), res.arrayBuffer());
