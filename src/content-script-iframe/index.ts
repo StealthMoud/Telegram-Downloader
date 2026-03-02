@@ -113,3 +113,22 @@ async function handleMediaDownload(targetEl: HTMLElement, mid: string, btn: HTML
         }
       }
     }
+  } else {
+    // Web K: Poll for media-viewer-whole
+    for (let i = 0; i < 15; i++) {
+      await sleep(200);
+      const viewer = document.querySelector('.media-viewer-whole');
+      if (viewer) {
+        const video = viewer.querySelector('video') as HTMLVideoElement;
+        const img = viewer.querySelector('img.media-photo') as HTMLImageElement;
+        if (video?.src && video.src.length > 20) {
+          capturedUrl = video.src;
+          type = 'video';
+          break;
+        } else if (img?.src && img.src.length > 20) {
+          capturedUrl = img.src;
+          type = 'image';
+          break;
+        }
+      }
+    }
