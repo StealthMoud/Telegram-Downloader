@@ -341,3 +341,18 @@ function extractFileNameFromUrl(url, type) {
       const jsonStr = decodeURIComponent(url.split('stream/')[1]);
       const metadata = JSON.parse(jsonStr);
       if (metadata.fileName) {
+        fileName = metadata.fileName;
+      } else if (metadata.location && metadata.location.id) {
+        fileName = metadata.location.id + '.' + fileExtension;
+      }
+    }
+
+    if (fileName) {
+      return fileName.replace(/[<>:"/\\|?*]/g, '_').trim();
+    }
+    return undefined;
+  } catch (e) {
+    return undefined;
+  }
+}
+
