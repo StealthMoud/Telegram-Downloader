@@ -106,3 +106,10 @@ async function handleMediaDownload(targetEl: HTMLElement, mid: string, btn: HTML
           capturedUrl = video.src;
           type = 'video';
           break;
+        } else if (img?.src && img.src.length > 20) {
+          capturedUrl = img.src;
+          type = 'image';
+          break;
+        }
+      }
+    }
