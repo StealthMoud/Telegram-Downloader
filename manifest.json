@@ -1,0 +1,60 @@
+{
+  "action": {
+    "default_icon": {
+      "128": "src/assets/icon_128.png"
+    },
+    "default_title": "Telegram Downloader - Download videos instantly",
+    "default_popup": "src/popup/index.html"
+  },
+  "background": {
+    "service_worker": "src/background/index.ts",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "js": [
+        "src/content-script-iframe/index.ts"
+      ],
+      "matches": [
+        "https://web.telegram.org/*",
+        "https://tg-video-downloader.net/*"
+      ],
+      "run_at": "document_end"
+    }
+  ],
+  "default_locale": "en",
+  "description": "__MSG_desc__",
+  "host_permissions": [
+    "https://web.telegram.org/*",
+    "https://tg-video-downloader.net/*",
+    "https://api.tg-video-downloader.net/*"
+  ],
+  "icons": {
+    "128": "src/assets/icon_128.png"
+  },
+  "manifest_version": 3,
+  "name": "__MSG_name__",
+  "options_page": "src/options/index.html",
+  "permissions": [
+    "storage",
+    "activeTab",
+    "sidePanel",
+    "tabs",
+    "scripting"
+  ],
+  "side_panel": {
+    "default_path": "src/side-panel/index.html"
+  },
+  "version": "2.3.0",
+  "version_name": "2.3.0",
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "main.js"
+      ],
+      "matches": [
+        "https://web.telegram.org/*"
+      ]
+    }
+  ]
+}
