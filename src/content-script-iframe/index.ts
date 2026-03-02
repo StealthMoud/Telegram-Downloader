@@ -37,3 +37,14 @@ function getBestName(container: HTMLElement): string {
     }
   }
 
+  // 2. Class-based Titles (Web A & K)
+  const titleSelectors = [
+    '.file-title', '.document-title', '.audio-title',
+    '.file-name', '.document-name', '.document-title',
+    '.Document .title', '.Audio .title', '.Audio .name'
+  ];
+  for (const sel of titleSelectors) {
+    const el = container.querySelector(sel) as HTMLElement;
+    if (el && el.innerText.trim()) return el.innerText.trim();
+  }
+
