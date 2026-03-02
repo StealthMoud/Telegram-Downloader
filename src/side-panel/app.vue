@@ -163,3 +163,18 @@ onMounted(() => {
   padding: 16px;
 }
 
+.info-card h4 { margin: 0 0 10px; color: #cbd5e1; font-size: 14px; }
+
+.info-card ol { margin: 0; padding-left: 20px; font-size: 13px; color: #94a3b8; line-height: 1.8; }
+
+.download-list { display: flex; flex-direction: column; gap: 12px; }
+
+.download-item {
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 12px;
+  padding: 12px;
+  transition: transform 0.2s ease;
+}
+
+.item-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
