@@ -211,3 +211,18 @@ async function handleDownload(url, id, page, download_id, detail) {
     page,
     download_id,
     abortController,
+    lastProgress: 0
+  });
+
+  try {
+    // 1. Check for initial Pause/Cancel
+    let dl = downloadRegistry.get(id);
+    if (!dl || dl.status === 'cancelled') return;
+    if (dl.status === 'paused') await waitForResume(id);
+
+    // 2. Initial Metadata Fetch
+    let { segmentCount: n, segmentSize: c, contentSize: d, contentType: f } = await fetchUrl(url, abortController.signal);
+
+    // 3. Re-check after Fetch
+    dl = downloadRegistry.get(id);
+    if (!dl || dl.status === 'cancelled') return;
