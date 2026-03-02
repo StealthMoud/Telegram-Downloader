@@ -99,3 +99,20 @@ const downloadVideo = (url, id = '', page, download_id, detail) => {
     if (dl.status === 'paused') {
       await waitForResume(id);
     }
+
+    fetch(url, {
+      method: 'GET',
+      headers: {
+        Range: `bytes=${nextOffset}-`,
+      },
+      'User-Agent': UserAgent,
+      signal: abortController.signal
+    })
+      .then((res) => {
+        if (![200, 206].includes(res.status)) {
+          throw new Error('Non 200/206 response was received: ' + res.status);
+        }
+        const mime = res.headers.get('Content-Type').split(';')[0];
+        fileExtension = mime.split('/')[1];
+        fileName = detail?.title || fileName.substring(0, fileName.indexOf('.') + 1) + fileExtension;
+        fileName = detail?.customTitle ? detail.customTitle + '_' + fileName : fileName;
