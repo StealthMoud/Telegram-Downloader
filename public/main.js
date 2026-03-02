@@ -356,3 +356,16 @@ function extractFileNameFromUrl(url, type) {
   }
 }
 
+function updateProgress(p, id, pa, d_id, status = 'downloading') {
+  const dl = downloadRegistry.get(id);
+  if (dl) {
+    dl.lastProgress = p;
+  }
+
+  if (id != '') {
+    let media_download_event_progress = new CustomEvent(id + '_download_progress', {
+      detail: { video_id: id, progress: p, page: pa, download_id: d_id, status: status },
+    });
+    document.dispatchEvent(media_download_event_progress);
+  }
+}
