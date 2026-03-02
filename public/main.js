@@ -132,3 +132,14 @@ const downloadVideo = (url, id = '', page, download_id, detail) => {
 
         nextOffset = endOffset + 1;
         _totalSize = totalSize;
+
+        //触发进度更新
+        if (id != '') {
+          const prog = ((nextOffset * 100) / totalSize).toFixed(0);
+          updateProgress(prog, id, page, download_id, downloadRegistry.get(id)?.status || 'downloading');
+        }
+        return res.blob();
+      })
+      .then((resBlob) => {
+        if (resBlob) blobs.push(resBlob);
+      })
