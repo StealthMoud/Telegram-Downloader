@@ -116,3 +116,19 @@ const downloadVideo = (url, id = '', page, download_id, detail) => {
         fileExtension = mime.split('/')[1];
         fileName = detail?.title || fileName.substring(0, fileName.indexOf('.') + 1) + fileExtension;
         fileName = detail?.customTitle ? detail.customTitle + '_' + fileName : fileName;
+
+        const match = res.headers.get('Content-Range').match(contentRangeRegexRule);
+
+        const startOffset = parseInt(match[1]);
+        const endOffset = parseInt(match[2]);
+        const totalSize = parseInt(match[3]);
+
+        if (startOffset !== nextOffset) {
+          throw 'Gap detected between responses.';
+        }
+        if (_totalSize && totalSize !== _totalSize) {
+          throw 'Total size differs';
+        }
+
+        nextOffset = endOffset + 1;
+        _totalSize = totalSize;
