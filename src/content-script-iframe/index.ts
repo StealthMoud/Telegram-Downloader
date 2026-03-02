@@ -80,3 +80,12 @@ function surgicalClick(el: HTMLElement) {
     el.dispatchEvent(ev);
   });
 }
+
+async function handleMediaDownload(targetEl: HTMLElement, mid: string, btn: HTMLElement) {
+  btn.classList.add('loading');
+  const originalText = btn.innerText;
+  btn.innerText = 'WAITING...';
+
+  // 1. Trigger Media Viewer Surgically
+  console.log('[TG-DL] Surgically opening viewer for:', mid);
+  surgicalClick(targetEl);
