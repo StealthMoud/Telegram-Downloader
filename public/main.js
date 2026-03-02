@@ -303,3 +303,16 @@ async function fetchResults(tasks, batchSize, retryOnError, downloadId, abortSig
           let { index } = error.cause;
           currentIndex = index;
           await delay(1000);
+        }
+      } else {
+        throw error;
+      }
+    }
+  }
+  return results;
+}
+
+async function delay(e) {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve(null);
