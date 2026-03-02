@@ -51,3 +51,17 @@ function waitForResume(id) {
     resumeSignals.addEventListener('resume_' + id, handler);
   });
 }
+
+//监听自定义事件
+document.addEventListener('media_download_event', function (e) {
+  if (e.detail.type == 'single') {
+    //单个下载
+    handleDownload(e.detail.video_src.video_url, e.detail.video_src.video_id, e.detail.video_src.page, e.detail.video_src.download_id, e.detail);
+  } else if (e.detail.type == 'batch') {
+    //批量下载
+    let video_list = e.detail.video_src;
+    for (let i = 0; i < video_list.length; i++) {
+      handleDownload(video_list[i].video_url, video_list[i].video_id, video_list[i].page, video_list[i].download_id, e.detail);
+    }
+  }
+});
