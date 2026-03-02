@@ -211,3 +211,22 @@ async function handleMediaDownload(targetEl: HTMLElement, mid: string, btn: HTML
     }
     btn.classList.remove('loading');
     btn.innerText = originalText;
+  }, 1200);
+}
+async function handleAudioDownload(container: HTMLElement, mid: string, btn: HTMLElement) {
+  btn.classList.add('loading');
+  btn.innerText = 'WAITING...';
+
+  const playBtn = container.querySelector('.audio-play-icon, .Audio .play-button, [class*="play-button"]') as HTMLElement;
+  if (!playBtn) {
+    btn.classList.remove('loading');
+    btn.innerText = 'DOWNLOAD AUDIO';
+    return;
+  }
+
+  playBtn.click();
+  await sleep(1500);
+
+  const audioTags = document.querySelectorAll('audio');
+  let audioUrl = null;
+  for (const a of audioTags) {
