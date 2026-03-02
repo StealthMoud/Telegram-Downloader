@@ -59,3 +59,11 @@ function getBestName(container: HTMLElement): string {
 
   return '';
 }
+
+let version: 'a' | 'k' | 'unknown' = 'unknown';
+function detectVersion() {
+  const url = window.location.href;
+  if (url.includes('web.telegram.org/a')) version = 'a';
+  else if (url.includes('web.telegram.org/k')) version = 'k';
+}
+
