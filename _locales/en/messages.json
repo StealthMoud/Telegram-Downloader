@@ -1,0 +1,18 @@
+{
+   "desc": {
+      "description": "",
+      "message": "Download videos from Telegram private channels and restricted groups. Batch save videos, photos, music, and GIFs with one click."
+   },
+   "export_chat_history": {
+      "description": "Tooltip for export button in chat header",
+      "message": "Export Chat History"
+   },
+   "extensionInstalled": {
+      "description": "Message shown when extension is installed",
+      "message": "Extension installed successfully! Please refresh the page to enable new features."
+   },
+   "name": {
+      "description": "",
+      "message": "Telegram Video Downloader - Save Restricted Media"
+   }
+}
