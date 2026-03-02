@@ -248,3 +248,22 @@ async function handleDownload(url, id, page, download_id, detail) {
             let prog = ((a / d) * 100).toFixed(2);
 
             return (updateProgress(prog, id, page, download_id, downloadRegistry.get(id)?.status || 'downloading'), res.arrayBuffer());
+          });
+      }),
+      // Extract filename from URL as fallback, but prioritize detail.title
+      name = detail?.title || extractFileNameFromUrl(url, f) || 'telegram_file';
+
+    // Reducing batch size slightly for better stability in multi-download
+    let h = await fetchResults(progress, 15, '11', id, abortController.signal);
+
+    if (downloadRegistry.get(id)?.status === 'cancelled') return;
+
+    let m = new Blob(h, { type: f || 'application/octet-stream' });
+    let downloadUrl = URL.createObjectURL(m);
+    const customFilename = detail?.customTitle ? detail.customTitle + '_' + name : name;
+    saveFile(downloadUrl, customFilename);
+
+    downloadRegistry.delete(id);
+    updateProgress(100, id, page, download_id, 'finished');
+  } catch (e) {
+    if (e.name === 'AbortError' || e.message === 'Download cancelled') {
