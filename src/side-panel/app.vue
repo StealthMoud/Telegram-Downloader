@@ -194,3 +194,26 @@ onMounted(() => {
 .progress-bar { height: 100%; background: #38bdf8; border-radius: 3px; transition: width 0.3s ease; }
 
 .pulse { animation: pulse-animation 2s infinite; }
+
+@keyframes pulse-animation {
+  0% { opacity: 1; }
+  50% { opacity: 0.6; }
+  100% { opacity: 1; }
+}
+
+.item-footer { display: flex; justify-content: space-between; align-items: center; font-size: 11px; color: #64748b; margin-top: 4px;}
+
+.controls { display: flex; gap: 8px; }
+.ctrl-btn { 
+  background: rgba(255,255,255,0.05); 
+  border: 1px solid rgba(255,255,255,0.1); 
+  color: #94a3b8; 
+  padding: 4px 8px; 
+  border-radius: 4px; 
+  cursor: pointer; 
+  font-size: 10px;
+  transition: all 0.2s ease;
+}
+.ctrl-btn:hover { background: rgba(255,255,255,0.1); color: #f1f5f9; }
+.ctrl-btn.cancel:hover { background: #991b1b; color: white; border-color: #991b1b; }
+
