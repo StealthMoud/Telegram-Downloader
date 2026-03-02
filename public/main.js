@@ -13,3 +13,11 @@ window.addEventListener('message', (e) => {
   if (type === 'PAUSE_DOWNLOAD') pauseDownload(id);
   if (type === 'RESUME_DOWNLOAD') resumeDownload(id);
   if (type === 'CANCEL_DOWNLOAD') cancelDownload(id);
+});
+
+function pauseDownload(id) {
+  const dl = downloadRegistry.get(id);
+  if (dl) {
+    dl.status = 'paused';
+    updateProgress(dl.lastProgress, id, dl.page, dl.download_id, 'paused');
+  }
