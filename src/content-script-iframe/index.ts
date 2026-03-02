@@ -132,3 +132,20 @@ async function handleMediaDownload(targetEl: HTMLElement, mid: string, btn: HTML
         }
       }
     }
+
+    // Web K Fallback: Trigger Quality Menu if still no URL
+    if (!capturedUrl && version === 'k') {
+      const viewer = document.querySelector('.media-viewer-whole');
+      const buttons = viewer?.querySelectorAll('.media-viewer-buttons .btn-icon');
+      if (buttons && buttons.length >= 3) {
+        surgicalClick(buttons[2] as HTMLElement); // 3rd is Quality
+        await sleep(500);
+        const firstMenuItem = document.querySelector('.quality-download-options-button-menu .btn-menu-item') as HTMLElement;
+        if (firstMenuItem) {
+          surgicalClick(firstMenuItem);
+          await sleep(1000);
+          const video = viewer?.querySelector('video') as HTMLVideoElement;
+          if (video?.src) capturedUrl = video.src;
+        }
+      }
+    }
