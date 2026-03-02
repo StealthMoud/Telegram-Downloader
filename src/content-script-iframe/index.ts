@@ -149,3 +149,17 @@ async function handleMediaDownload(targetEl: HTMLElement, mid: string, btn: HTML
         }
       }
     }
+  }
+
+  // 3. Dispatch to Engine
+  if (capturedUrl) {
+    const prefix = await getFilenameBase();
+    const bestName = getBestName(targetEl.closest('.message-list-item, .bubble-content-wrapper') as HTMLElement || targetEl);
+    const finalTitle = bestName || `telegram_media_${mid}`;
+
+    chrome.runtime.sendMessage({
+      type: 'download_status',
+      id: mid,
+      status: 'starting',
+      title: finalTitle
+    });
