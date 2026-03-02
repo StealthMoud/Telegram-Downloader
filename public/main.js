@@ -316,3 +316,28 @@ async function delay(e) {
   return new Promise((resolve) => {
     setTimeout(() => {
       resolve(null);
+    }, e);
+  });
+}
+function saveFile(e, t, n) {
+  let r = document.createElement('a');
+  ((r.href = e), (r.download = t), r.click());
+}
+
+function extractFileNameFromUrl(url, type) {
+  let fileExtension = type ? type.split('/')[1] : 'file';
+
+  try {
+    let fileName = '';
+    if (url.includes('progressive/')) {
+      // a-version (Web A)
+      const parts = url.split('document');
+      if (parts.length > 1) {
+        const afterDoc = parts[1].split('/')[0];
+        fileName = afterDoc.startsWith(':') ? afterDoc.substring(1) : afterDoc;
+      }
+    } else if (url.includes('stream/')) {
+      // k-version (Web K) or Audio
+      const jsonStr = decodeURIComponent(url.split('stream/')[1]);
+      const metadata = JSON.parse(jsonStr);
+      if (metadata.fileName) {
