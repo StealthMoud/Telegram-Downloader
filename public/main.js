@@ -267,3 +267,20 @@ async function handleDownload(url, id, page, download_id, detail) {
     updateProgress(100, id, page, download_id, 'finished');
   } catch (e) {
     if (e.name === 'AbortError' || e.message === 'Download cancelled') {
+      console.log('Download cancelled/aborted:', id);
+    } else {
+      console.error('Download error:', e);
+      updateProgress(0, id, page, download_id, 'error');
+    }
+    downloadRegistry.delete(id);
+  }
+}
+
+async function fetchResults(tasks, batchSize, retryOnError, downloadId, abortSignal) {
+  let results = [],
+    currentIndex = 0;
+
+  while (currentIndex < tasks.length) {
+    // 1. Check for Cancellation
+    if (abortSignal?.aborted || downloadRegistry.get(downloadId)?.status === 'cancelled') {
+      throw new Error('Download cancelled');
