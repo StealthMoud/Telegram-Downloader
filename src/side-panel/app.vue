@@ -103,3 +103,23 @@ const cancelDownload = async (dl: Download) => {
 onMounted(() => {
   loadDownloads();
 
+  chrome.runtime.onMessage.addListener((msg) => {
+    if (msg.type === 'download_status') {
+      const idx = downloads.value.findIndex(d => d.id === msg.id);
+      if (idx !== -1) {
+        downloads.value[idx].progress = msg.progress;
+        downloads.value[idx].status = msg.status;
+        if (msg.title) downloads.value[idx].title = msg.title;
+      } else {
+        downloads.value.push({
+          id: msg.id,
+          title: msg.title || 'Unknown File',
+          progress: msg.progress || 0,
+          status: msg.status,
+          timestamp: Date.now()
+        });
+      }
+      saveDownloads();
+    }
+  });
+});
