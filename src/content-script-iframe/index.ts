@@ -278,3 +278,23 @@ async function handleAudioDownload(container: HTMLElement, mid: string, btn: HTM
   } else {
     alert('Could not capture audio stream.');
   }
+
+  btn.classList.remove('loading');
+  btn.innerText = 'DOWNLOAD AUDIO';
+}
+
+// --- UI INJECTION ---
+
+function addDownloadButton(container: HTMLElement, targetEl: HTMLElement, mid: string, type: 'media' | 'audio') {
+  if (container.hasAttribute(PROCESSED_ATTR)) return;
+  container.setAttribute(PROCESSED_ATTR, '1');
+
+  const btn = document.createElement('button');
+  btn.className = 'tg-download-btn' + (type === 'audio' ? ' downloadaudio' : '');
+  btn.innerText = type === 'audio' ? 'DOWNLOAD AUDIO' : 'DOWNLOAD';
+
+  btn.onclick = async (e) => {
+    e.stopPropagation();
+    if (type === 'audio') {
+      await handleAudioDownload(container, mid, btn);
+    } else {
