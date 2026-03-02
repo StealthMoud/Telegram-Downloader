@@ -217,3 +217,21 @@ onMounted(() => {
 .ctrl-btn:hover { background: rgba(255,255,255,0.1); color: #f1f5f9; }
 .ctrl-btn.cancel:hover { background: #991b1b; color: white; border-color: #991b1b; }
 
+.info { display: flex; align-items: center; gap: 8px; }
+.cancelled { color: #f87171; font-weight: 600; }
+
+.clear-btn {
+  margin-top: 20px;
+  width: 100%;
+  padding: 8px;
+  background: transparent;
+  border: 1px solid #334155;
+  color: #94a3b8;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: all 0.2s ease;
+}
+
+.clear-btn:hover { background: #1e293b; color: #f1f5f9; border-color: #475569; }
+</style>
