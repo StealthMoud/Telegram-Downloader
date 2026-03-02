@@ -173,3 +173,18 @@ async function handleMediaDownload(targetEl: HTMLElement, mid: string, btn: HTML
       }
     });
 
+    // Listen for progress
+    const progressId = `${mid}_download_progress`;
+    const progressHandler = (ev: any) => {
+      const prog = ev.detail.progress || 0;
+      const status = ev.detail.status || (prog >= 100 ? 'finished' : 'downloading');
+
+      chrome.runtime.sendMessage({
+        type: 'download_status',
+        id: mid,
+        status: status,
+        progress: prog
+      });
+      if (prog >= 100 || status === 'cancelled') document.removeEventListener(progressId, progressHandler);
+    };
+    document.addEventListener(progressId, progressHandler);
