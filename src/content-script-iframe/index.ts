@@ -24,3 +24,16 @@ async function getFilenameBase() {
     return '';
   }
 }
+
+function getBestName(container: HTMLElement): string {
+  // 1. Files/Documents with <a> and download attribute (Original Logic)
+  const downloadLinks = container.querySelectorAll('a[href]');
+  for (const link of Array.from(downloadLinks)) {
+    const a = link as HTMLAnchorElement;
+    if (a.querySelector('img')) continue; // Skip images
+    const name = a.getAttribute('download') || a.innerText.trim();
+    if (name && name !== 'file' && !name.startsWith('http') && !name.startsWith('blob:')) {
+      return name;
+    }
+  }
+
