@@ -166,7 +166,8 @@ const downloadVideo = (url, id = '', page, download_id, detail) => {
     if (downloadRegistry.get(id)?.status === 'cancelled') return;
 
     const customFilename = detail?.customTitle ? detail.customTitle + '_' + fileName : fileName;
-    const blob = new Blob(blobs, { type: 'video/mp4' });
+    const detectedMime = fileExtension ? `application/${fileExtension}` : 'application/octet-stream';
+    const blob = new Blob(blobs, { type: detectedMime });
     const blobUrl = window.URL.createObjectURL(blob);
 
     const a = document.createElement('a');

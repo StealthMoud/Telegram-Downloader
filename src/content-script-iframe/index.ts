@@ -283,20 +283,183 @@ async function handleAudioDownload(container: HTMLElement, mid: string, btn: HTM
   btn.innerText = 'DOWNLOAD AUDIO';
 }
 
+async function handleDocumentDownload(container: HTMLElement, mid: string, btn: HTMLElement) {
+  btn.classList.add('loading');
+  const originalText = btn.innerText;
+  btn.innerText = 'WAITING...';
+
+  const prefix = await getFilenameBase();
+  const bestName = getBestName(container);
+  const title = bestName || `document_${mid}`;
+
+  let capturedUrl: string | null = null;
+
+  // Strategy 1: Intercept blob URL creation by hooking URL.createObjectURL
+  const originalCreateObjectURL = URL.createObjectURL;
+  let interceptedBlobUrl: string | null = null;
+  URL.createObjectURL = function (obj: Blob | MediaSource) {
+    const url = originalCreateObjectURL.call(URL, obj);
+    interceptedBlobUrl = url;
+    return url;
+  };
+
+  // Strategy 2: Look for download button in the document container and click it
+  // Web K: .document with .document-download or clickable area
+  // Web A: .Document with download button
+  const downloadBtn = container.querySelector(
+    '.document-download, .download-button, .btn-icon.tgico-download, .document-download-button'
+  ) as HTMLElement;
+
+  if (downloadBtn) {
+    surgicalClick(downloadBtn);
+  } else {
+    // Click the document container itself to trigger Telegram's download
+    const clickTarget = container.querySelector(
+      '.document-thumb, .document-ico, .document-name, .file-title, .document-title'
+    ) as HTMLElement;
+    if (clickTarget) {
+      surgicalClick(clickTarget);
+    } else {
+      surgicalClick(container);
+    }
+  }
+
+  // Wait for blob URL interception or Telegram to process
+  await sleep(2000);
+
+  // Restore original function
+  URL.createObjectURL = originalCreateObjectURL;
+
+  if (interceptedBlobUrl) {
+    capturedUrl = interceptedBlobUrl;
+  }
+
+  // Strategy 3: If no blob URL was intercepted, try to extract stream/progressive URL
+  // by looking at the page's active network requests or document links
+  if (!capturedUrl) {
+    // Look for any anchor elements with download attributes that might have been created
+    const allAnchors = document.querySelectorAll('a[download]');
+    for (const anchor of Array.from(allAnchors)) {
+      const a = anchor as HTMLAnchorElement;
+      if (a.href && (a.href.startsWith('blob:') || a.href.includes('stream/') || a.href.includes('progressive/'))) {
+        capturedUrl = a.href;
+        break;
+      }
+    }
+  }
+
+  // Strategy 4: For Web K, try to find the stream URL from the document's data attributes
+  if (!capturedUrl && version === 'k') {
+    // In Web K, documents are loaded through stream URLs similar to videos
+    // Try clicking the main document area and then looking for the download
+    const docEl = container.closest('.document, .document-container') as HTMLElement;
+    if (docEl) {
+      // Look for preloader that indicates a download is in progress
+      for (let i = 0; i < 10; i++) {
+        await sleep(500);
+        // Check if a blob URL was intercepted during this time
+        if (interceptedBlobUrl) {
+          capturedUrl = interceptedBlobUrl;
+          break;
+        }
+        // Check for newly created download links
+        const newAnchors = document.querySelectorAll('a[download]');
+        for (const anchor of Array.from(newAnchors)) {
+          const a = anchor as HTMLAnchorElement;
+          if (a.href && a.href.startsWith('blob:')) {
+            capturedUrl = a.href;
+            break;
+          }
+        }
+        if (capturedUrl) break;
+      }
+    }
+  }
+
+  // Strategy 5: For Web A, similar approach
+  if (!capturedUrl && version === 'a') {
+    for (let i = 0; i < 10; i++) {
+      await sleep(500);
+      if (interceptedBlobUrl) {
+        capturedUrl = interceptedBlobUrl;
+        break;
+      }
+      const newAnchors = document.querySelectorAll('a[download]');
+      for (const anchor of Array.from(newAnchors)) {
+        const a = anchor as HTMLAnchorElement;
+        if (a.href && a.href.startsWith('blob:')) {
+          capturedUrl = a.href;
+          break;
+        }
+      }
+      if (capturedUrl) break;
+    }
+  }
+
+  // Dispatch to download engine
+  if (capturedUrl) {
+    chrome.runtime.sendMessage({
+      type: 'download_status',
+      id: mid,
+      status: 'starting',
+      title: title
+    });
+
+    const event = new CustomEvent(DOWNLOAD_EVENT, {
+      detail: {
+        video_src: { video_url: capturedUrl, video_id: mid, page: 'content', download_id: mid },
+        type: 'single',
+        fileType: 'document',
+        title: title,
+        customTitle: prefix
+      }
+    });
+
+    // Listen for progress
+    const progressId = `${mid}_download_progress`;
+    const progressHandler = (ev: any) => {
+      const prog = ev.detail.progress || 0;
+      const status = ev.detail.status || (prog >= 100 ? 'finished' : 'downloading');
+
+      chrome.runtime.sendMessage({
+        type: 'download_status',
+        id: mid,
+        status: status,
+        progress: prog
+      });
+      if (prog >= 100 || status === 'cancelled') document.removeEventListener(progressId, progressHandler);
+    };
+    document.addEventListener(progressId, progressHandler);
+
+    document.dispatchEvent(event);
+  } else {
+    // Fallback: If we couldn't capture the URL, the document might have already
+    // been downloaded by Telegram's native download mechanism triggered by our click.
+    // Show a helpful message.
+    alert('The file download has been triggered via Telegram. Check your downloads folder. If it did not start, try clicking the file directly in the chat.');
+  }
+
+  btn.classList.remove('loading');
+  btn.innerText = originalText;
+}
+
 // --- UI INJECTION ---
 
-function addDownloadButton(container: HTMLElement, targetEl: HTMLElement, mid: string, type: 'media' | 'audio') {
+function addDownloadButton(container: HTMLElement, targetEl: HTMLElement, mid: string, type: 'media' | 'audio' | 'document') {
   if (container.hasAttribute(PROCESSED_ATTR)) return;
   container.setAttribute(PROCESSED_ATTR, '1');
 
   const btn = document.createElement('button');
-  btn.className = 'tg-download-btn' + (type === 'audio' ? ' downloadaudio' : '');
-  btn.innerText = type === 'audio' ? 'DOWNLOAD AUDIO' : 'DOWNLOAD';
+  btn.className = 'tg-download-btn' + (type === 'audio' ? ' downloadaudio' : type === 'document' ? ' downloaddoc' : '');
+  btn.innerText = type === 'audio' ? 'DOWNLOAD AUDIO' : type === 'document' ? 'DOWNLOAD FILE' : 'DOWNLOAD';
 
   btn.onclick = async (e) => {
     e.stopPropagation();
+    e.preventDefault();
     if (type === 'audio') {
       await handleAudioDownload(container, mid, btn);
+    } else if (type === 'document') {
+      await handleDocumentDownload(container, mid, btn);
     } else {
       await handleMediaDownload(targetEl, mid, btn);
     }
@@ -319,6 +482,10 @@ function scan() {
 
     const audio = el.querySelector('.Audio') as HTMLElement;
     if (audio) addDownloadButton(audio, audio, mid, 'audio');
+
+    // Documents (PDFs, ZIPs, photos/videos sent as documents)
+    const doc = el.querySelector('.Document:not(.Audio)') as HTMLElement;
+    if (doc && !media && !audio) addDownloadButton(doc, doc, mid, 'document');
   });
 
   // Web K
@@ -330,10 +497,34 @@ function scan() {
     if (el.classList.contains('audio')) {
       addDownloadButton(el as HTMLElement, el as HTMLElement, mid, 'audio');
     } else {
-      // Only inject if it's a media container, not just text
-      const media = el.querySelector('.media-photo, .media-video, .document-container, img.full-media') as HTMLElement;
-      if (media) addDownloadButton(el as HTMLElement, media, mid, 'media');
+      // Check for document container separately from media
+      const docContainer = el.querySelector('.document-container, .document') as HTMLElement;
+      const media = el.querySelector('.media-photo, .media-video, img.full-media') as HTMLElement;
+
+      if (docContainer && !media) {
+        // This is a document (file, photo-as-document, video-as-document)
+        addDownloadButton(el as HTMLElement, docContainer, mid, 'document');
+      } else if (media) {
+        // This is regular media (photo, video)
+        addDownloadButton(el as HTMLElement, media, mid, 'media');
+      }
     }
+  });
+
+  // Web K: Also scan for standalone document messages that may not be in bubble-content-wrapper
+  document.querySelectorAll('.document-container, .document').forEach(el => {
+    // Skip if already processed or inside an already-processed wrapper
+    if ((el as HTMLElement).hasAttribute(PROCESSED_ATTR)) return;
+    if (el.closest(`[${PROCESSED_ATTR}]`)) return;
+
+    const parent = el.closest('[data-mid], [data-message-id]') as HTMLElement;
+    const mid = parent?.getAttribute('data-mid') || parent?.getAttribute('data-message-id');
+    if (!mid) return;
+
+    // Skip audio documents
+    if (el.classList.contains('audio') || el.closest('.audio')) return;
+
+    addDownloadButton(el as HTMLElement, el as HTMLElement, mid, 'document');
   });
 }
 
@@ -372,6 +563,8 @@ function init() {
       }
       .tg-download-btn.loading { opacity: 0.7 !important; pointer-events: none !important; }
       .downloadaudio { min-width: 120px !important; }
+      .downloaddoc { min-width: 120px !important; background: linear-gradient(135deg, #10b981 0%, #34d399 100%) !important; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2) !important; }
+      .downloaddoc:hover { box-shadow: 0 6px 16px rgba(16, 185, 129, 0.3) !important; }
     `;
     document.head.appendChild(s);
   }
