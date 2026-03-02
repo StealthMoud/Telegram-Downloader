@@ -42,3 +42,4 @@ walkthrough.md
 *.txt
 *.py
 *.sh
+service-worker-loader.js
