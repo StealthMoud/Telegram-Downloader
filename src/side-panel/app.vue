@@ -143,3 +143,23 @@ onMounted(() => {
 }
 
 .header h3 { margin: 0; font-size: 18px; font-weight: 700; background: linear-gradient(to right, #38bdf8, #818cf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+.badge {
+  background: linear-gradient(135deg, #1677ff 0%, #2aa0ff 100%);
+  color: white;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+}
+
+.hint { color: #94a3b8; font-size: 13px; margin-bottom: 16px; text-align: center; }
+
+.info-card {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.05);
+  border-radius: 12px;
+  padding: 16px;
+}
+
