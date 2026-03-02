@@ -61,6 +61,7 @@ interface Download {
 const downloads = ref<Download[]>([]);
 
 const sortedDownloads = computed(() => {
+  if (!Array.isArray(downloads.value)) return [];
   return [...downloads.value].sort((a, b) => b.timestamp - a.timestamp);
 });
 
@@ -71,8 +72,10 @@ const truncate = (str: string) => {
 
 const loadDownloads = async () => {
   const data = await chrome.storage.local.get(['active_downloads']);
-  if (data.active_downloads) {
+  if (Array.isArray(data.active_downloads)) {
     downloads.value = data.active_downloads as Download[];
+  } else {
+    downloads.value = [];
   }
 };
 
