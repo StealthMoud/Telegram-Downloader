@@ -159,3 +159,25 @@ const downloadVideo = (url, id = '', page, download_id, detail) => {
         console.error('downloadVideo fetch error:', reason, fileName);
         updateProgress(0, id, page, download_id, 'error');
         downloadRegistry.delete(id);
+      });
+  };
+
+  const saveFile = () => {
+    if (downloadRegistry.get(id)?.status === 'cancelled') return;
+
+    const customFilename = detail?.customTitle ? detail.customTitle + '_' + fileName : fileName;
+    const blob = new Blob(blobs, { type: 'video/mp4' });
+    const blobUrl = window.URL.createObjectURL(blob);
+
+    const a = document.createElement('a');
+    document.body.appendChild(a);
+    a.href = blobUrl;
+    a.download = customFilename;
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(blobUrl);
+
+    downloadRegistry.delete(id);
+    updateProgress(100, id, page, download_id, 'finished');
+  };
+
