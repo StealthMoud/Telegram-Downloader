@@ -67,3 +67,16 @@ function detectVersion() {
   else if (url.includes('web.telegram.org/k')) version = 'k';
 }
 
+// --- CORE EXTRACTION ENGINE ---
+
+/**
+ * Surgical Click: Dispatches precise MouseEvents like the original code
+ */
+function surgicalClick(el: HTMLElement) {
+  if (!el) return;
+  const events = ['mouseover', 'mousedown', 'mouseup', 'click'];
+  events.forEach(name => {
+    const ev = new MouseEvent(name, { bubbles: true, cancelable: true, view: window });
+    el.dispatchEvent(ev);
+  });
+}
