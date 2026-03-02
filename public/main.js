@@ -197,3 +197,17 @@ async function fetchUrl(url, abortSignal) {
     segmentCount: Math.ceil(r / o),
     contentSize: r,
     segmentSize: o,
+  };
+}
+
+async function handleDownload(url, id, page, download_id, detail) {
+  if (url.startsWith('blob:')) {
+    return downloadVideo(url, id, page, download_id, detail);
+  }
+
+  const abortController = new AbortController();
+  downloadRegistry.set(id, {
+    status: 'downloading',
+    page,
+    download_id,
+    abortController,
