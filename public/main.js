@@ -65,3 +65,18 @@ document.addEventListener('media_download_event', function (e) {
     }
   }
 });
+
+const downloadVideo = (url, id = '', page, download_id, detail) => {
+  let blobs = [];
+  let nextOffset = 0;
+  let _totalSize = null;
+  let fileExtension = 'mp4';
+  const UserAgent = 'User-Agent Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:109.0) Gecko/20100101 Firefox/117.0';
+
+  const abortController = new AbortController();
+  downloadRegistry.set(id, {
+    status: 'downloading',
+    page,
+    download_id,
+    abortController,
+    lastProgress: 0
