@@ -53,3 +53,28 @@ import { ref, onMounted, computed } from 'vue';
 interface Download {
   id: string;
   title: string;
+  progress: number;
+  status: 'starting' | 'downloading' | 'paused' | 'finished' | 'cancelled' | 'error';
+  timestamp: number;
+}
+
+const downloads = ref<Download[]>([]);
+
+const sortedDownloads = computed(() => {
+  return [...downloads.value].sort((a, b) => b.timestamp - a.timestamp);
+});
+
+const truncate = (str: string) => {
+  if (str.length <= 25) return str;
+  return str.substring(0, 22) + '...';
+};
+
+const loadDownloads = async () => {
+  const data = await chrome.storage.local.get(['active_downloads']);
+  if (data.active_downloads) {
+    downloads.value = data.active_downloads as Download[];
+  }
+};
+
+const saveDownloads = async () => {
+  await chrome.storage.local.set({ active_downloads: downloads.value });
