@@ -284,3 +284,22 @@ async function fetchResults(tasks, batchSize, retryOnError, downloadId, abortSig
     // 1. Check for Cancellation
     if (abortSignal?.aborted || downloadRegistry.get(downloadId)?.status === 'cancelled') {
       throw new Error('Download cancelled');
+    }
+
+    // 2. Check for Pause
+    const dl = downloadRegistry.get(downloadId);
+    if (dl && dl.status === 'paused') {
+      await waitForResume(downloadId);
+    }
+
+    let batch = tasks.slice(currentIndex, currentIndex + batchSize).map((task) => task());
+    try {
+      let batchResults = await Promise.all(batch);
+      results.push(...batchResults);
+      currentIndex += batchSize;
+    } catch (error) {
+      if (error instanceof Error) {
+        if (retryOnError && error.message === 'fetch Error') {
+          let { index } = error.cause;
+          currentIndex = index;
+          await delay(1000);
