@@ -181,3 +181,19 @@ const downloadVideo = (url, id = '', page, download_id, detail) => {
     updateProgress(100, id, page, download_id, 'finished');
   };
 
+  fetchNextPart();
+};
+
+async function fetchUrl(url, abortSignal) {
+  let t = await fetch(url, { headers: { Range: 'bytes=0-' }, signal: abortSignal });
+  if (!t.ok) throw Error(`HTTP error! Status: ${t.status}`);
+  let r = parseInt(t.headers.get('Content-Range').split('/')[1], 10),
+    o = parseInt(t.headers.get('Content-Length'), 10),
+    n = t.headers.get('Content-Type'),
+    s = t.headers.get('Accept-Ranges');
+  if ('bytes' !== s) throw Error('Server does not support partial content (byte ranges)');
+  return {
+    contentType: n,
+    segmentCount: Math.ceil(r / o),
+    contentSize: r,
+    segmentSize: o,
