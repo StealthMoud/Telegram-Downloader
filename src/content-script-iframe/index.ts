@@ -255,3 +255,26 @@ async function handleAudioDownload(container: HTMLElement, mid: string, btn: HTM
         fileType: 'audio',
         title: title,
         customTitle: prefix
+      }
+    });
+
+    // Listen for progress from main.js
+    const progressId = `${mid}_download_progress`;
+    const handler = (ev: any) => {
+      const prog = ev.detail.progress || 0;
+      const status = ev.detail.status || (prog >= 100 ? 'finished' : 'downloading');
+
+      chrome.runtime.sendMessage({
+        type: 'download_status',
+        id: mid,
+        status: status,
+        progress: prog
+      });
+      if (prog >= 100 || status === 'cancelled') document.removeEventListener(progressId, handler);
+    };
+    document.addEventListener(progressId, handler);
+
+    document.dispatchEvent(event);
+  } else {
+    alert('Could not capture audio stream.');
+  }
