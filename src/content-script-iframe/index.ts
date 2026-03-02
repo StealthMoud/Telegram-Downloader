@@ -230,3 +230,28 @@ async function handleAudioDownload(container: HTMLElement, mid: string, btn: HTM
   const audioTags = document.querySelectorAll('audio');
   let audioUrl = null;
   for (const a of audioTags) {
+    if (a.src) { audioUrl = a.src; break; }
+  }
+
+  if (audioUrl) {
+    playBtn.click(); // Stop
+    const prefix = await getFilenameBase();
+    const bestName = getBestName(container);
+    const title = bestName || `audio_${mid}`;
+
+    // Notify Side Panel: Starting
+    chrome.runtime.sendMessage({
+      type: 'download_status',
+      id: mid,
+      status: 'downloading',
+      progress: 0,
+      title: title
+    });
+
+    const event = new CustomEvent(DOWNLOAD_EVENT, {
+      detail: {
+        video_src: { video_url: audioUrl, video_id: mid, page: 'content', download_id: mid },
+        type: 'single',
+        fileType: 'audio',
+        title: title,
+        customTitle: prefix
