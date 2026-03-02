@@ -89,3 +89,13 @@ const downloadVideo = (url, id = '', page, download_id, detail) => {
       fileName = metadata.fileName;
     }
   } catch (e) { }
+
+  const fetchNextPart = async () => {
+    // 1. Check for Cancellation
+    const dl = downloadRegistry.get(id);
+    if (!dl || dl.status === 'cancelled') return;
+
+    // 2. Check for Pause
+    if (dl.status === 'paused') {
+      await waitForResume(id);
+    }
