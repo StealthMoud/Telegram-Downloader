@@ -21,3 +21,12 @@ function pauseDownload(id) {
     dl.status = 'paused';
     updateProgress(dl.lastProgress, id, dl.page, dl.download_id, 'paused');
   }
+}
+
+function resumeDownload(id) {
+  const dl = downloadRegistry.get(id);
+  if (dl && dl.status === 'paused') {
+    dl.status = 'downloading';
+    resumeSignals.dispatchEvent(new CustomEvent('resume_' + id));
+    updateProgress(dl.lastProgress, id, dl.page, dl.download_id, 'downloading');
+  }
