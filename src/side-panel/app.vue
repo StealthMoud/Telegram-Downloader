@@ -178,3 +178,19 @@ onMounted(() => {
 }
 
 .item-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+
+.file-name { font-size: 13px; font-weight: 500; color: #f1f5f9; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.status-tag { font-size: 9px; font-weight: 700; padding: 2px 6px; border-radius: 4px; }
+.status-tag.starting { background: #475569; color: #cbd5e1; }
+.status-tag.downloading { background: #0369a1; color: #7dd3fc; }
+.status-tag.paused { background: #854d0e; color: #fef08a; }
+.status-tag.finished { background: #065f46; color: #6ee7b7; }
+.status-tag.cancelled { background: #450a0a; color: #f87171; }
+.status-tag.error { background: #991b1b; color: #fca5a5; }
+
+.progress-container { height: 6px; background: #0f172a; border-radius: 3px; overflow: hidden; margin-bottom: 8px; }
+
+.progress-bar { height: 100%; background: #38bdf8; border-radius: 3px; transition: width 0.3s ease; }
+
+.pulse { animation: pulse-animation 2s infinite; }
