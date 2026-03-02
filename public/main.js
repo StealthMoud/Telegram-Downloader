@@ -80,3 +80,12 @@ const downloadVideo = (url, id = '', page, download_id, detail) => {
     download_id,
     abortController,
     lastProgress: 0
+  });
+
+  let fileName = detail?.title || (Math.random() + 1).toString(36).substring(2, 10);
+  try {
+    const metadata = JSON.parse(decodeURIComponent(url.split('/')[url.split('/').length - 1]));
+    if (metadata.fileName) {
+      fileName = metadata.fileName;
+    }
+  } catch (e) { }
