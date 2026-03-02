@@ -40,3 +40,14 @@ function cancelDownload(id) {
     downloadRegistry.delete(id);
     updateProgress(0, id, dl.page, dl.download_id, 'cancelled');
   }
+}
+
+function waitForResume(id) {
+  return new Promise((resolve) => {
+    const handler = () => {
+      resumeSignals.removeEventListener('resume_' + id, handler);
+      resolve();
+    };
+    resumeSignals.addEventListener('resume_' + id, handler);
+  });
+}
