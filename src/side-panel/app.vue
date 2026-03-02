@@ -78,3 +78,28 @@ const loadDownloads = async () => {
 
 const saveDownloads = async () => {
   await chrome.storage.local.set({ active_downloads: downloads.value });
+};
+
+const clearList = () => {
+  downloads.value = downloads.value.filter(d => d.status !== 'finished' && d.status !== 'cancelled');
+  saveDownloads();
+};
+
+const togglePause = async (dl: Download) => {
+  const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+  if (tab?.id) {
+    const type = dl.status === 'paused' ? 'RESUME_DOWNLOAD' : 'PAUSE_DOWNLOAD';
+    chrome.tabs.sendMessage(tab.id, { type, id: dl.id });
+  }
+};
+
+const cancelDownload = async (dl: Download) => {
+  const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+  if (tab?.id) {
+    chrome.tabs.sendMessage(tab.id, { type: 'CANCEL_DOWNLOAD', id: dl.id });
+  }
+};
+
+onMounted(() => {
+  loadDownloads();
+
