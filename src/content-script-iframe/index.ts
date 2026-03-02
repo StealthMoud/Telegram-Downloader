@@ -48,3 +48,14 @@ function getBestName(container: HTMLElement): string {
     if (el && el.innerText.trim()) return el.innerText.trim();
   }
 
+  // 3. Caption/Message Text fallback
+  const textSelectors = ['.caption', '.text-content', '.message', '.bubble-content .text', '.message-text'];
+  for (const sel of textSelectors) {
+    const el = container.querySelector(sel) as HTMLElement;
+    if (el && el.innerText.trim()) {
+      return el.innerText.trim().split('\n')[0].substring(0, 50).replace(/[<>:"/\\|?*]/g, '_').trim();
+    }
+  }
+
+  return '';
+}
