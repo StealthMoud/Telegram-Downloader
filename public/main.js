@@ -71,6 +71,7 @@ const downloadVideo = (url, id = '', page, download_id, detail) => {
   let nextOffset = 0;
   let _totalSize = null;
   let fileExtension = 'mp4';
+  let fileMimeType = 'video/mp4';
   const UserAgent = 'User-Agent Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:109.0) Gecko/20100101 Firefox/117.0';
 
   const abortController = new AbortController();
@@ -113,6 +114,7 @@ const downloadVideo = (url, id = '', page, download_id, detail) => {
           throw new Error('Non 200/206 response was received: ' + res.status);
         }
         const mime = res.headers.get('Content-Type').split(';')[0];
+        fileMimeType = mime;
         fileExtension = mime.split('/')[1];
         fileName = detail?.title || fileName.substring(0, fileName.indexOf('.') + 1) + fileExtension;
         fileName = detail?.customTitle ? detail.customTitle + '_' + fileName : fileName;
@@ -166,8 +168,7 @@ const downloadVideo = (url, id = '', page, download_id, detail) => {
     if (downloadRegistry.get(id)?.status === 'cancelled') return;
 
     const customFilename = detail?.customTitle ? detail.customTitle + '_' + fileName : fileName;
-    const detectedMime = fileExtension ? `application/${fileExtension}` : 'application/octet-stream';
-    const blob = new Blob(blobs, { type: detectedMime });
+    const blob = new Blob(blobs, { type: fileMimeType });
     const blobUrl = window.URL.createObjectURL(blob);
 
     const a = document.createElement('a');
